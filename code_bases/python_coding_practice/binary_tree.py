@@ -1,5 +1,6 @@
 import numpy as np
 import queue
+import stack
 
 
 class TreeNode:
@@ -66,6 +67,11 @@ class TreeNode:
         # node
         print(self.value),
 
+    def is_leaf_node(self):
+        if (self._left is None) and (self._right is None):
+            return True
+        else:
+            return False
 
 class BinaryTree:
 
@@ -104,6 +110,26 @@ class BinaryTree:
                     if curr_node._right is not None:
                         queue_obj.add_element(curr_node._right)
 
+    def depth_first_traveral(self):
+        if self._root is None:
+            print('Tree is empty.')
+        else:
+            stack_obj = stack.Stack()
+            stack_obj.push(self._root)
+            while True:
+                curr_node = stack_obj.peek()
+                if curr_node is None:
+                    break
+                else:
+                    if curr_node.is_leaf_node():
+                        curr_node = stack_obj.pop()
+                        print(curr_node.value),
+                    else:
+                        if curr_node._left is not None:
+                            stack_obj.push(curr_node._left)
+                        if curr_node._right is not None:
+                            stack_obj.push(curr_node._right)
+
     def traversal(self, traveral_type):
         if self._root is not None:
             if traveral_type == 'pre_order':
@@ -122,6 +148,10 @@ class BinaryTree:
                 print('.......Breadth-First traversal........')
                 self.breadth_first_traversal()
                 print('')
+            elif traveral_type == 'depth_first':
+                print('.......Depth-First traversal........')
+                self.depth_first_traveral()
+                print('')
             else:
                 raise AssertionError
         else:
@@ -136,3 +166,4 @@ if __name__ == '__main__':
     binary_tree_obj.traversal(traveral_type='in_order')
     binary_tree_obj.traversal(traveral_type='post_order')
     binary_tree_obj.traversal(traveral_type='breadth_first')
+    binary_tree_obj.traversal(traveral_type='depth_first')
