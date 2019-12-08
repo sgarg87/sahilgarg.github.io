@@ -1,11 +1,13 @@
 import numpy as np
+import queue
 
 
 class TreeNode:
-    def __init__(self, value, left=None, right=None):
+    def __init__(self, value, left=None, right=None, is_root=False):
         self.value = value
         self._left = left
         self._right = right
+        self.is_root = is_root
 
     def find_position_for_element(self, element):
         assert element is not None
@@ -73,7 +75,7 @@ class BinaryTree:
     def add_element(self, element):
         if self._root is None:
             print('Adding {} as a root node.'.format(element))
-            self._root = TreeNode(element, left=None, right=None)
+            self._root = TreeNode(element, left=None, right=None, is_root=True)
         else:
             parent_node, position = self._root.find_position_for_element(element=element)
             print('Adding {} as a {} child to {}.'.format(element, position, parent_node.value))
@@ -84,6 +86,23 @@ class BinaryTree:
         for curr_idx, curr_input in enumerate(inputs):
             self.add_element(curr_input)
         print('')
+
+    def breadth_first_traversal(self):
+        if self._root is None:
+            print('Tree is empty.')
+        else:
+            queue_obj = queue.Queue()
+            queue_obj.add_element(self._root)
+            while True:
+                curr_node = queue_obj.remove_element()
+                if curr_node is None:
+                    break
+                else:
+                    print(curr_node.value),
+                    if curr_node._left is not None:
+                        queue_obj.add_element(curr_node._left)
+                    if curr_node._right is not None:
+                        queue_obj.add_element(curr_node._right)
 
     def traversal(self, traveral_type):
         if self._root is not None:
@@ -99,6 +118,10 @@ class BinaryTree:
                 print('........Post-order traversal.......')
                 self._root.postorder_traversal()
                 print('')
+            elif traveral_type == 'breadth_first':
+                print('.......Breadth-First traversal........')
+                self.breadth_first_traversal()
+                print('')
             else:
                 raise AssertionError
         else:
@@ -112,3 +135,4 @@ if __name__ == '__main__':
     binary_tree_obj.traversal(traveral_type='pre_order')
     binary_tree_obj.traversal(traveral_type='in_order')
     binary_tree_obj.traversal(traveral_type='post_order')
+    binary_tree_obj.traversal(traveral_type='breadth_first')
