@@ -9,6 +9,7 @@ class TreeNode:
         self._left = left
         self._right = right
         self.is_root = is_root
+        self.is_visited = False
 
     def find_position_for_element(self, element):
         assert element is not None
@@ -73,6 +74,30 @@ class TreeNode:
         else:
             return False
 
+    def depth_first_traverse(self):
+        assert not self.is_visited
+        self.is_visited = True
+
+        depth = 0
+
+        # left child
+        if (self._left is not None) and (not self._left.is_visited):
+            left_subtree_depth = self._left.depth_first_traverse()
+            depth = max(depth, left_subtree_depth)
+
+        # right child
+        if (self._right is not None) and (not self._right.is_visited):
+            right_subtree_depth = self._right.depth_first_traverse()
+            depth = max(depth, right_subtree_depth)
+
+        # node itself
+        print(self.value),
+        self.is_visited = False
+        depth += 1
+
+        return depth
+
+
 class BinaryTree:
 
     def __init__(self):
@@ -110,25 +135,62 @@ class BinaryTree:
                     if curr_node._right is not None:
                         queue_obj.add_element(curr_node._right)
 
+    def depth_first_traveral_without_stack(self):
+        # using function call stack
+        if self._root is None:
+            print('Tree is empty.')
+        else:
+            print('Depth first recursion without stack.')
+            max_depth = self._root.depth_first_traverse()
+            print('')
+            print(max_depth)
+
     def depth_first_traveral(self):
+        traversed_nodes_list = []
+        max_depth = 0
+
+        # todo: add code for visited nodes
         if self._root is None:
             print('Tree is empty.')
         else:
             stack_obj = stack.Stack()
+            # print('Pushing root {}.'.format(self._root.value))
+            assert not self._root.is_visited
+            self._root.is_visited = True
             stack_obj.push(self._root)
-            while True:
+            max_depth = max(max_depth, stack_obj.depth)
+
+            while not stack_obj.is_empty():
                 curr_node = stack_obj.peek()
-                if curr_node is None:
-                    break
-                else:
-                    if curr_node.is_leaf_node():
-                        curr_node = stack_obj.pop()
-                        print(curr_node.value),
-                    else:
-                        if curr_node._left is not None:
-                            stack_obj.push(curr_node._left)
-                        if curr_node._right is not None:
-                            stack_obj.push(curr_node._right)
+                # print('Peeked {}.'.format(curr_node.value))
+                assert curr_node is not None
+
+                is_leaf_node_pushed = False
+                if not curr_node.is_leaf_node():
+                    if (curr_node._left is not None) and (not curr_node._left.is_visited):
+                        curr_node._left.is_visited = True
+                        stack_obj.push(curr_node._left)
+                        # print('Pushing left {}.'.format(curr_node._left.value))
+                        is_leaf_node_pushed = True
+                        max_depth = max(stack_obj.depth, max_depth)
+                    elif (curr_node._right is not None) and (not curr_node._right.is_visited):
+                        curr_node._right.is_visited = True
+                        stack_obj.push(curr_node._right)
+                        # print('Pushing right {}.'.format(curr_node._right.value))
+                        is_leaf_node_pushed = True
+                        max_depth = max(stack_obj.depth, max_depth)
+
+                if not is_leaf_node_pushed:
+                    curr_node = stack_obj.pop()
+                    traversed_nodes_list.append(curr_node)
+                    # print('Popping {}.'.format(curr_node.value))
+
+        for curr_node in traversed_nodes_list:
+            curr_node.is_visited = False
+            print(curr_node.value),
+        print('')
+
+        print(max_depth)
 
     def traversal(self, traveral_type):
         if self._root is not None:
@@ -152,6 +214,10 @@ class BinaryTree:
                 print('.......Depth-First traversal........')
                 self.depth_first_traveral()
                 print('')
+            elif traveral_type == 'depth_first_without_stack':
+                print('.......Depth-First traversal........')
+                self.depth_first_traveral_without_stack()
+                print('')
             else:
                 raise AssertionError
         else:
@@ -167,3 +233,4 @@ if __name__ == '__main__':
     binary_tree_obj.traversal(traveral_type='post_order')
     binary_tree_obj.traversal(traveral_type='breadth_first')
     binary_tree_obj.traversal(traveral_type='depth_first')
+    binary_tree_obj.traversal(traveral_type='depth_first_without_stack')

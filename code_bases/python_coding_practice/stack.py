@@ -12,9 +12,11 @@ class Node:
 class Stack:
     def __init__(self):
         self._top_node = None
+        self.depth = 0
 
     def push(self, element):
         node = Node(value=element, bottom=None, top=None, is_top_node=True)
+
         if self._top_node is None:
             self._top_node = node
             del node
@@ -22,6 +24,8 @@ class Stack:
             node.bottom = self._top_node
             self._top_node.is_top_node = False
             self._top_node = node
+
+        self.depth += 1
 
     def pop(self):
         if self._top_node is None:
@@ -39,11 +43,11 @@ class Stack:
                 self._top_node = new_top_node
                 del new_top_node
             else:
-                self._top_node.bottom = None
                 assert self._top_node.top is None
                 self._top_node = None
 
             # print('Popping element {}.'.format(element))
+            self.depth -= 1
             return element
 
     def peek(self):
