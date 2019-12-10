@@ -74,7 +74,7 @@ class TreeNode:
         else:
             return False
 
-    def depth_first_traverse(self):
+    def depth_first_traverse_recursion(self):
         assert not self.is_visited
         self.is_visited = True
 
@@ -82,12 +82,12 @@ class TreeNode:
 
         # left child
         if (self._left is not None) and (not self._left.is_visited):
-            left_subtree_depth = self._left.depth_first_traverse()
+            left_subtree_depth = self._left.depth_first_traverse_recursion()
             depth = max(depth, left_subtree_depth)
 
         # right child
         if (self._right is not None) and (not self._right.is_visited):
-            right_subtree_depth = self._right.depth_first_traverse()
+            right_subtree_depth = self._right.depth_first_traverse_recursion()
             depth = max(depth, right_subtree_depth)
 
         # node itself
@@ -96,6 +96,50 @@ class TreeNode:
         depth += 1
 
         return depth
+
+    def depth_first_traverse(self):
+        traversed_nodes = []
+        max_depth = 0
+
+        stack_obj = stack.Stack()
+        assert not self.is_visited
+        self.is_visited = True
+        stack_obj.push(self)
+        max_depth = max(max_depth, stack_obj.depth)
+
+        while not stack_obj.is_empty():
+            curr_node = stack_obj.peek()
+            # print('Peeked {}.'.format(curr_node.value))
+            assert curr_node is not None
+
+            is_leaf_node_pushed = False
+            if not curr_node.is_leaf_node():
+                if (curr_node._left is not None) and (not curr_node._left.is_visited):
+                    curr_node._left.is_visited = True
+                    stack_obj.push(curr_node._left)
+                    # print('Pushing left {}.'.format(curr_node._left.value))
+                    is_leaf_node_pushed = True
+                    max_depth = max(stack_obj.depth, max_depth)
+                elif (curr_node._right is not None) and (not curr_node._right.is_visited):
+                    curr_node._right.is_visited = True
+                    stack_obj.push(curr_node._right)
+                    # print('Pushing right {}.'.format(curr_node._right.value))
+                    is_leaf_node_pushed = True
+                    max_depth = max(stack_obj.depth, max_depth)
+
+            if not is_leaf_node_pushed:
+                curr_node = stack_obj.pop()
+                traversed_nodes.append(curr_node)
+                # print('Popping {}.'.format(curr_node.value))
+
+        for curr_node in traversed_nodes:
+            curr_node.is_visited = False
+            print(curr_node.value),
+        print('')
+
+        print(max_depth)
+
+        return traversed_nodes, max_depth
 
 
 class BinaryTree:
@@ -135,62 +179,62 @@ class BinaryTree:
                     if curr_node._right is not None:
                         queue_obj.add_element(curr_node._right)
 
-    def depth_first_traveral_without_stack(self):
+    def depth_first_traveral_recursion(self):
         # using function call stack
         if self._root is None:
             print('Tree is empty.')
         else:
             print('Depth first recursion without stack.')
-            max_depth = self._root.depth_first_traverse()
+            max_depth = self._root.depth_first_traverse_recursion()
             print('')
             print(max_depth)
 
-    def depth_first_traveral(self):
-        traversed_nodes_list = []
-        max_depth = 0
+    def match_two_lists_nodes_by_value(self, list1, list2):
+        for curr_idx, curr_node_list1 in enumerate(list1):
+            curr_node_list2 = list2[curr_idx]
+            if curr_node_list1.value != curr_node_list2.value:
+                return False
+        return True
 
-        # todo: add code for visited nodes
+    def mirror_image(self, node1, node2):
+        if (node1 is not None) and (node2 is not None):
+            if node2.value != node2.value:
+                return False
+            else:
+                return self.mirror_image(node1._right, node2._left) & self.mirror_image(node1._left, node2._right)
+        elif (node1 is None) and (node2 is None):
+            return True
+        else:
+            return False
+
+    def is_symmetric(self):
+        print('Is Symmetric?')
+        root_node = self._root
+        if root_node is None:
+            return None
+        else:
+            if root_node.is_leaf_node():
+                return True
+            else:
+                return self.mirror_image(root_node._left, root_node._right)
+
+    def depth_first_traveral(self):
         if self._root is None:
             print('Tree is empty.')
         else:
-            stack_obj = stack.Stack()
-            # print('Pushing root {}.'.format(self._root.value))
-            assert not self._root.is_visited
-            self._root.is_visited = True
-            stack_obj.push(self._root)
-            max_depth = max(max_depth, stack_obj.depth)
+            traversed_nodes, max_depth = self._root.depth_first_traverse()
 
-            while not stack_obj.is_empty():
-                curr_node = stack_obj.peek()
-                # print('Peeked {}.'.format(curr_node.value))
-                assert curr_node is not None
+    def construct_binary_tree_for_symmetry_and_test(self):
+        self._root = TreeNode(value=1, is_root=True)
+        self._root._left = TreeNode(value=2)
+        self._root._right = TreeNode(value=2)
+        self._root._left._left = TreeNode(value=3)
+        self._root._left._right = TreeNode(value=4)
+        self._root._right._left = TreeNode(value=4)
+        self._root._right._right = TreeNode(value=3)
 
-                is_leaf_node_pushed = False
-                if not curr_node.is_leaf_node():
-                    if (curr_node._left is not None) and (not curr_node._left.is_visited):
-                        curr_node._left.is_visited = True
-                        stack_obj.push(curr_node._left)
-                        # print('Pushing left {}.'.format(curr_node._left.value))
-                        is_leaf_node_pushed = True
-                        max_depth = max(stack_obj.depth, max_depth)
-                    elif (curr_node._right is not None) and (not curr_node._right.is_visited):
-                        curr_node._right.is_visited = True
-                        stack_obj.push(curr_node._right)
-                        # print('Pushing right {}.'.format(curr_node._right.value))
-                        is_leaf_node_pushed = True
-                        max_depth = max(stack_obj.depth, max_depth)
-
-                if not is_leaf_node_pushed:
-                    curr_node = stack_obj.pop()
-                    traversed_nodes_list.append(curr_node)
-                    # print('Popping {}.'.format(curr_node.value))
-
-        for curr_node in traversed_nodes_list:
-            curr_node.is_visited = False
-            print(curr_node.value),
-        print('')
-
-        print(max_depth)
+        is_symmetric = self.is_symmetric()
+        print('is_symmetric', is_symmetric)
 
     def traversal(self, traveral_type):
         if self._root is not None:
@@ -216,7 +260,7 @@ class BinaryTree:
                 print('')
             elif traveral_type == 'depth_first_without_stack':
                 print('.......Depth-First traversal........')
-                self.depth_first_traveral_without_stack()
+                self.depth_first_traveral_recursion()
                 print('')
             else:
                 raise AssertionError
@@ -226,6 +270,7 @@ class BinaryTree:
 
 if __name__ == '__main__':
     inputs = np.array(['F', 'B', 'G', 'A', 'D', 'I', 'C', 'E', 'H'])
+    print('**********************************')
     binary_tree_obj = BinaryTree()
     binary_tree_obj.construct_binary_tree(inputs=inputs)
     binary_tree_obj.traversal(traveral_type='pre_order')
@@ -234,3 +279,6 @@ if __name__ == '__main__':
     binary_tree_obj.traversal(traveral_type='breadth_first')
     binary_tree_obj.traversal(traveral_type='depth_first')
     binary_tree_obj.traversal(traveral_type='depth_first_without_stack')
+    is_symmetric = binary_tree_obj.is_symmetric()
+    print('is_symmetric', is_symmetric)
+    binary_tree_obj.construct_binary_tree_for_symmetry_and_test()
