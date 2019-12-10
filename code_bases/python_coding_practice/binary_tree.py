@@ -97,6 +97,47 @@ class TreeNode:
 
         return depth
 
+    def max_depth_recursion(self):
+        if self.is_leaf_node():
+            return 1
+        else:
+            # left child
+            if self._left is not None:
+                left_subtree_depth = self._left.max_depth_recursion()
+            else:
+                left_subtree_depth = 0
+
+            # right child
+            if self._right is not None:
+                right_subtree_depth = self._right.max_depth_recursion()
+            else:
+                right_subtree_depth = 0
+
+            return max(left_subtree_depth, right_subtree_depth)+1
+
+    def path_sums_recursion(self, path_sum, sum=0):
+        sum += self.value
+
+        if self.is_leaf_node():
+            if sum == path_sum:
+                return True
+            else:
+                return False
+        else:
+            # left child
+            if (self._left is not None) and (not self._left.is_visited):
+                is_path_sum_match_left_subtree = self._left.path_sums_recursion(path_sum=path_sum, sum=sum)
+            else:
+                is_path_sum_match_left_subtree = False
+
+            # right child
+            if (self._right is not None) and (not self._right.is_visited):
+                is_path_sum_match_right_subtree = self._right.path_sums_recursion(path_sum=path_sum, sum=sum)
+            else:
+                is_path_sum_match_right_subtree = False
+
+            return is_path_sum_match_left_subtree | is_path_sum_match_right_subtree
+
     def depth_first_traverse(self):
         traversed_nodes = []
         max_depth = 0
@@ -196,12 +237,12 @@ class BinaryTree:
                 return False
         return True
 
-    def mirror_image(self, node1, node2):
+    def _mirror_image(self, node1, node2):
         if (node1 is not None) and (node2 is not None):
             if node2.value != node2.value:
                 return False
             else:
-                return self.mirror_image(node1._right, node2._left) & self.mirror_image(node1._left, node2._right)
+                return self._mirror_image(node1._right, node2._left) & self._mirror_image(node1._left, node2._right)
         elif (node1 is None) and (node2 is None):
             return True
         else:
@@ -216,7 +257,22 @@ class BinaryTree:
             if root_node.is_leaf_node():
                 return True
             else:
-                return self.mirror_image(root_node._left, root_node._right)
+                return self._mirror_image(root_node._left, root_node._right)
+
+    def max_depth(self):
+        if self._root is None:
+            return 0
+        else:
+            return self._root.max_depth_recursion()
+
+    def path_sums_recursion(self, path_sum):
+        if self._root is None:
+            if path_sum == 0:
+                return True
+            else:
+                return False
+        else:
+            return self._root.path_sums_recursion(path_sum=path_sum)
 
     def depth_first_traveral(self):
         if self._root is None:
@@ -270,7 +326,6 @@ class BinaryTree:
 
 if __name__ == '__main__':
     inputs = np.array(['F', 'B', 'G', 'A', 'D', 'I', 'C', 'E', 'H'])
-    print('**********************************')
     binary_tree_obj = BinaryTree()
     binary_tree_obj.construct_binary_tree(inputs=inputs)
     binary_tree_obj.traversal(traveral_type='pre_order')
@@ -281,4 +336,16 @@ if __name__ == '__main__':
     binary_tree_obj.traversal(traveral_type='depth_first_without_stack')
     is_symmetric = binary_tree_obj.is_symmetric()
     print('is_symmetric', is_symmetric)
+    max_depth = binary_tree_obj.max_depth()
+    print('max_depth', max_depth)
+
+    inputs = np.array([5, 4, 8, 11, 13, 4, 7, 2, 1])
+    binary_tree_obj = BinaryTree()
+    binary_tree_obj.construct_binary_tree(inputs=inputs)
+    max_depth = binary_tree_obj.max_depth()
+    print('max_depth', max_depth)
+    for path_length in [16, 1, 37, 2, 5, 23]:
+        is_path_length_match = binary_tree_obj.path_sums_recursion(path_sum=path_length)
+        print('is_path_length_match: {}, {}'.format(path_length, is_path_length_match))
+
     binary_tree_obj.construct_binary_tree_for_symmetry_and_test()
