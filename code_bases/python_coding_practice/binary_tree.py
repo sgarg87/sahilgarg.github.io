@@ -177,16 +177,120 @@ class TreeNode:
             curr_node.is_visited = False
             print(curr_node.value),
         print('')
-
         print(max_depth)
 
         return traversed_nodes, max_depth
+
+    @staticmethod
+    def split_inorder_into_left_and_right_subtree_elements(inorder_elements, root_element):
+        # assume unique elements
+        root_in_inorder_idx = np.where(inorder_elements == root_element)[0]
+        assert root_in_inorder_idx.size == 1
+        root_in_inorder_idx = root_in_inorder_idx[0]
+        left_subtree_elements = inorder_elements[:root_in_inorder_idx]
+        right_subtree_elements = inorder_elements[root_in_inorder_idx+1:]
+        return left_subtree_elements, right_subtree_elements
+
+    @staticmethod
+    def select_subset_of_elements_from_array_keeping_order(ordered_arr, elements_to_select):
+        assert ordered_arr.dtype == elements_to_select.dtype
+        ordered_indices_of_elements = np.zeros(elements_to_select.size, ordered_arr.dtype)
+        count_idx = 0
+        for curr_idx, curr_element in enumerate(ordered_arr):
+            if curr_element in elements_to_select:
+                ordered_indices_of_elements[count_idx] = curr_element
+                count_idx += 1
+        return ordered_indices_of_elements
+
+    @staticmethod
+    def construct_binary_tree_from_inorder_and_postorder_traversal(inorder_elements, postorder_elements):
+        # assume unique elements
+        num_elements = inorder_elements.size
+        assert num_elements == postorder_elements.size
+        assert np.unique(inorder_elements).size == num_elements
+        assert np.unique(postorder_elements).size == num_elements
+
+        if num_elements == 0:
+            return None
+        else:
+            root_element = postorder_elements[-1]
+            inorder_left_subtree_elements, inorder_right_subtree_elements = \
+                TreeNode.split_inorder_into_left_and_right_subtree_elements(
+                    inorder_elements=inorder_elements,
+                    root_element=root_element,
+            )
+            postorder_left_subtree_elements = TreeNode.select_subset_of_elements_from_array_keeping_order(
+                ordered_arr=postorder_elements,
+                elements_to_select=inorder_left_subtree_elements,
+            )
+            postorder_right_subtree_elements = TreeNode.select_subset_of_elements_from_array_keeping_order(
+                ordered_arr=postorder_elements,
+                elements_to_select=inorder_right_subtree_elements,
+            )
+            root_node = TreeNode(value=root_element)
+            root_node._left = TreeNode.construct_binary_tree_from_inorder_and_postorder_traversal(
+                inorder_elements=inorder_left_subtree_elements,
+                postorder_elements=postorder_left_subtree_elements,
+            )
+            root_node._right = TreeNode.construct_binary_tree_from_inorder_and_postorder_traversal(
+                inorder_elements=inorder_right_subtree_elements,
+                postorder_elements=postorder_right_subtree_elements,
+            )
+            return root_node
+
+    @staticmethod
+    def construct_binary_tree_from_inorder_and_preorder_traversal(inorder_elements, preorder_elements):
+        # assume unique elements
+        num_elements = inorder_elements.size
+        assert num_elements == preorder_elements.size
+        assert np.unique(inorder_elements).size == num_elements
+        assert np.unique(preorder_elements).size == num_elements
+
+        if num_elements == 0:
+            return None
+        else:
+            root_element = preorder_elements[0]
+            inorder_left_subtree_elements, inorder_right_subtree_elements = \
+                TreeNode.split_inorder_into_left_and_right_subtree_elements(
+                    inorder_elements=inorder_elements,
+                    root_element=root_element,
+            )
+            preorder_left_subtree_elements = TreeNode.select_subset_of_elements_from_array_keeping_order(
+                ordered_arr=preorder_elements,
+                elements_to_select=inorder_left_subtree_elements,
+            )
+            preorder_right_subtree_elements = TreeNode.select_subset_of_elements_from_array_keeping_order(
+                ordered_arr=preorder_elements,
+                elements_to_select=inorder_right_subtree_elements,
+            )
+            root_node = TreeNode(value=root_element)
+            root_node._left = TreeNode.construct_binary_tree_from_inorder_and_preorder_traversal(
+                inorder_elements=inorder_left_subtree_elements,
+                preorder_elements=preorder_left_subtree_elements,
+            )
+            root_node._right = TreeNode.construct_binary_tree_from_inorder_and_preorder_traversal(
+                inorder_elements=inorder_right_subtree_elements,
+                preorder_elements=preorder_right_subtree_elements,
+            )
+            return root_node
 
 
 class BinaryTree:
 
     def __init__(self):
         self._root = None
+
+    def construct_from_inorder_and_postorder(self, inorder_elements, postorder_elements):
+        self._root = TreeNode.construct_binary_tree_from_inorder_and_postorder_traversal(
+            inorder_elements=inorder_elements,
+            postorder_elements=postorder_elements,
+        )
+
+    def construct_from_inorder_and_preorder(self, inorder_elements, preorder_elements):
+        self._root = TreeNode.construct_binary_tree_from_inorder_and_preorder_traversal(
+            inorder_elements=inorder_elements,
+            preorder_elements=preorder_elements,
+        )
 
     def add_element(self, element):
         if self._root is None:
@@ -325,6 +429,7 @@ class BinaryTree:
 
 
 if __name__ == '__main__':
+    # traversal and maximum depth
     inputs = np.array(['F', 'B', 'G', 'A', 'D', 'I', 'C', 'E', 'H'])
     binary_tree_obj = BinaryTree()
     binary_tree_obj.construct_binary_tree(inputs=inputs)
@@ -339,13 +444,40 @@ if __name__ == '__main__':
     max_depth = binary_tree_obj.max_depth()
     print('max_depth', max_depth)
 
+    # max depth
     inputs = np.array([5, 4, 8, 11, 13, 4, 7, 2, 1])
     binary_tree_obj = BinaryTree()
     binary_tree_obj.construct_binary_tree(inputs=inputs)
     max_depth = binary_tree_obj.max_depth()
     print('max_depth', max_depth)
+
+    # path length
     for path_length in [16, 1, 37, 2, 5, 23]:
         is_path_length_match = binary_tree_obj.path_sums_recursion(path_sum=path_length)
         print('is_path_length_match: {}, {}'.format(path_length, is_path_length_match))
-
     binary_tree_obj.construct_binary_tree_for_symmetry_and_test()
+
+    # construct binary tree from inorder and postorder traversal
+    # inorder_elements = np.array([9, 3, 15, 20, 7])
+    # postorder_elements = np.array([9, 15, 7, 20, 3])
+    inorder_elements = np.array([9, 5, 1, 7, 2, 12, 8, 4, 3, 11])
+    postorder_elements = np.array([9, 1, 2, 12, 7, 5, 3, 11, 4, 8])
+    binary_tree_obj = BinaryTree()
+    binary_tree_obj.construct_from_inorder_and_postorder(
+        inorder_elements=inorder_elements,
+        postorder_elements=postorder_elements,
+    )
+    binary_tree_obj.traversal(traveral_type='in_order')
+    binary_tree_obj.traversal(traveral_type='post_order')
+
+
+    # construct binary tree from inorder and postorder traversal
+    inorder_elements = np.array([9, 3, 15, 20, 7])
+    preorder_elements = np.array([3, 9, 20, 15, 7])
+    binary_tree_obj = BinaryTree()
+    binary_tree_obj.construct_from_inorder_and_preorder(
+        inorder_elements=inorder_elements,
+        preorder_elements=preorder_elements,
+    )
+    binary_tree_obj.traversal(traveral_type='in_order')
+    binary_tree_obj.traversal(traveral_type='pre_order')
