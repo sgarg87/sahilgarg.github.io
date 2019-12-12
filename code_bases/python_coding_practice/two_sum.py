@@ -3,7 +3,7 @@ import numpy as np
 
 class TwoSum:
 
-    def find_indices_of_two_numbers_for_sum(self, inputs, sum_for_comparison):
+    def twoSum(self, inputs, sum_for_comparison):
         # not to access any input element twice
         # exactly one solution
         # integers
