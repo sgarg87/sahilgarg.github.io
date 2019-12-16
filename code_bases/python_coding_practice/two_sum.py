@@ -25,7 +25,7 @@ if __name__ == '__main__':
     inputs = np.array([2, 7, 11, 15])
     print('inputs', inputs)
     for sum_for_comparison in [9, 13, 18, 17, 22, 26]:
-        idx1, idx2 = two_sum_obj.find_indices_of_two_numbers_for_sum(
+        idx1, idx2 = two_sum_obj.twoSum(
             inputs=inputs,
             sum_for_comparison=sum_for_comparison,
         )
