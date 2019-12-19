@@ -28,10 +28,7 @@ class ReverseLinkedList:
         assert l1 is not None
         curr_node = l1
         while curr_node is not None:
-            curr_digit = curr_node.val
-            assert 0 <= curr_digit <= 9
-            print(curr_digit),
-
+            print(curr_node.val),
             curr_node = curr_node.next
         print('')
 
@@ -69,4 +66,3 @@ if __name__ == '__main__':
     obj.print_digits(head_inputs_as_list)
     reverse_list_head = obj.reverseList(head=head_inputs_as_list)
     obj.print_digits(reverse_list_head)
-
