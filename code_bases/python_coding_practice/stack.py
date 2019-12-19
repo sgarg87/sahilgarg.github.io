@@ -1,6 +1,15 @@
 import numpy as np
 
 
+class StackOverflowException(Exception):
+    def __init__(self, message, errors):
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
+        # Now for your custom code...
+        self.errors = errors
+
+
 class Node:
     def __init__(self, value, top, bottom, is_top_node=False):
         self.value = value
@@ -10,12 +19,20 @@ class Node:
 
 
 class Stack:
-    def __init__(self):
+    def __init__(self, max_size=None):
         self._top_node = None
         self.depth = 0
+        self.max_size = max_size
 
     def push(self, element):
-        node = Node(value=element, bottom=None, top=None, is_top_node=True)
+        if self.is_full():
+            raise StackOverflowException
+
+        node = Node(
+            value=element,
+            bottom=None,
+            top=None, is_top_node=True,
+        )
 
         if self._top_node is None:
             self._top_node = node
@@ -63,6 +80,13 @@ class Stack:
             return True
         else:
             return False
+
+    def is_full(self):
+        if self.max_size is None:
+            return False
+        else:
+            if self.depth >= self.max_size:
+                return True
 
     def construct_stack(self, inputs):
         print('Constructing Stack.')
