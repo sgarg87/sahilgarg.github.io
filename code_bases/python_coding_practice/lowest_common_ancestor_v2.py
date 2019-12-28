@@ -7,7 +7,6 @@ class TreeNode(object):
 
 
 class Solution(object):
-
     def path_from_leaf_node(self, leaf_node):
         path = []
         curr_node = leaf_node
