@@ -1,6 +1,3 @@
-import numpy as np
-import heapq as h
-
 
 class Solution(object):
 
