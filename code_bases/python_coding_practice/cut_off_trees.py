@@ -96,53 +96,6 @@ class Solution(object):
 
         return None
 
-    def dfs_search(self, forest, row_idx, col_idx, tree_height, distance, visited):
-        assert not visited[row_idx, col_idx], 'revisit [{}, {}]'.format(row_idx, col_idx)
-        assert forest[row_idx, col_idx] != 0, 'obstacle [{}, {}]'.format(row_idx, col_idx)
-        visited[row_idx, col_idx] = True
-        if forest[row_idx, col_idx] == tree_height:
-            return distance, (row_idx, col_idx)
-
-        min_distance = None
-        tree_location = None
-        move_choices = [
-            (row_idx-1, col_idx), (row_idx+1, col_idx),
-            (row_idx, col_idx-1), (row_idx, col_idx+1),
-        ]
-
-        # print(move_choices)
-        for curr_move in move_choices:
-
-            if (0 <= curr_move[0] < forest.shape[0]) and (0 <= curr_move[1] < forest.shape[1]):
-                if forest[curr_move[0], curr_move[1]] == 0:
-                    continue
-
-                if visited[curr_move[0], curr_move[1]]:
-                    continue
-
-                curr_distance, curr_tree_location = self._search(
-                    forest=forest, row_idx=curr_move[0], col_idx=curr_move[1],
-                    tree_height=tree_height, distance=distance+1,
-                    visited=visited,
-                )
-
-                if curr_distance is None:
-                    assert curr_tree_location is None
-                    continue
-                else:
-                    print('O({},{})  M{}, {}'.format(row_idx, col_idx, curr_move, curr_distance))
-                    if min_distance is None:
-                        min_distance = curr_distance
-                    else:
-                        min_distance = min(min_distance, curr_distance)
-
-                    if tree_location is None:
-                        tree_location = curr_tree_location
-                    else:
-                        assert tree_location == curr_tree_location
-
-        return min_distance, tree_location
-
     def cutOffTree(self, forest):
         """
         :type forest: List[List[int]]
