@@ -7,25 +7,30 @@ class Solution(object):
         :type n: int
         :rtype: int
         """
-        p = 0
+        if n <= 2:
+            return 0
 
-        primes = list()
-        for curr_n in range(2, n):
-            # is_prime = self.is_prime(n=curr_n, primes=primes)
-            # print(curr_n)
+        primes = [True]*n
+        # 0, 1 are not primes
+        primes[0] = False
+        primes[1] = False
 
-            is_prime = True
-            sqrt_n = math.sqrt(curr_n)
-            for curr_val in primes:
-                if curr_val <= sqrt_n:
-                    # divisible
-                    if (curr_n % curr_val) == 0:
+        n_sqrt = int(math.sqrt(n))
+        for i in xrange(2, n_sqrt+1):
+            if primes[i]:
+                sqrt_i = int(math.sqrt(i))
+
+                is_prime = True
+                for j in xrange(2, (sqrt_i+1)):
+                    if (i % j) == 0:
                         is_prime = False
                         break
 
-            if is_prime:
-                primes.append(curr_n)
-                # print(curr_n),
-                p += 1
+                # print(i, is_prime, sqrt_i)
 
-        return p
+                if is_prime:
+                    for k in range(2 * i, n, i):
+                        primes[k] = False
+
+        count = sum(primes)
+        return count
